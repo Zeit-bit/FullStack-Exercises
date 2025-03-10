@@ -8,12 +8,18 @@ const Statistics = ({ good, neutral, bad, all }) => {
         <>
           <h2>Statistics</h2>
           <ul>
-            <li>Good: {good}</li>
-            <li>Neutral: {neutral}</li>
-            <li>Bad: {bad}</li>
-            <li>All: {all}</li>
-            <li>Average: {all === 0 ? 0 : (good * 1 + bad * -1) / all}</li>
-            <li>Positive: {all === 0 ? 0 : (good * 100) / all} %</li>
+            <StatisticLine text="Good: " value={good} />
+            <StatisticLine text="Neutral: " value={neutral} />
+            <StatisticLine text="Bad: " value={bad} />
+            <StatisticLine text="All: " value={all} />
+            <StatisticLine
+              text="Average: "
+              value={all === 0 ? 0 : (good * 1 + bad * -1) / all}
+            />
+            <StatisticLine
+              text="Positive: "
+              value={(all === 0 ? 0 : (good * 100) / all) + " %"}
+            />
           </ul>
         </>
       );
@@ -28,23 +34,35 @@ const Statistics = ({ good, neutral, bad, all }) => {
   );
 };
 
+const Button = ({ onClick, text }) => {
+  return <button onClick={onClick}>{text}</button>;
+};
+
+const StatisticLine = ({ text, value }) => {
+  return (
+    <li>
+      {text}: {value}
+    </li>
+  );
+};
+
 const App = () => {
   const [good, setGood] = useState(0);
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
   const [all, setAll] = useState(0);
 
-  const Increase = (updateState, currentState) => {
-    updateState(currentState + 1);
+  const Increase = (UpdateState, currentState) => {
+    UpdateState(currentState + 1);
     setAll(all + 1);
   };
 
   return (
     <div>
       <h1>Give Feedback</h1>
-      <button onClick={() => Increase(setGood, good)}>Good</button>
-      <button onClick={() => Increase(setNeutral, neutral)}>Neutral</button>
-      <button onClick={() => Increase(setBad, bad)}>Bad</button>
+      <Button onClick={() => Increase(setGood, good)} text="Good" />
+      <Button onClick={() => Increase(setNeutral, neutral)} text="Neutral" />
+      <Button onClick={() => Increase(setBad, bad)} text="Bad" />
       <Statistics good={good} neutral={neutral} bad={bad} all={all} />
     </div>
   );
