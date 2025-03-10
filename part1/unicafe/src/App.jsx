@@ -1,17 +1,29 @@
 import { useState } from "react";
 
 const Statistics = ({ good, neutral, bad, all }) => {
+  let states = [good, neutral, bad, all];
+  for (let i = 0; i < 4; i++) {
+    if (states[i] !== 0) {
+      return (
+        <>
+          <h2>Statistics</h2>
+          <ul>
+            <li>Good: {good}</li>
+            <li>Neutral: {neutral}</li>
+            <li>Bad: {bad}</li>
+            <li>All: {all}</li>
+            <li>Average: {all === 0 ? 0 : (good * 1 + bad * -1) / all}</li>
+            <li>Positive: {all === 0 ? 0 : (good * 100) / all} %</li>
+          </ul>
+        </>
+      );
+    }
+  }
+
   return (
     <>
       <h2>Statistics</h2>
-      <ul>
-        <li>Good: {good}</li>
-        <li>Neutral: {neutral}</li>
-        <li>Bad: {bad}</li>
-        <li>All: {all}</li>
-        <li>Average: {all === 0 ? 0 : (good * 1 + bad * -1) / all}</li>
-        <li>Positive: {all === 0 ? 0 : (good * 100) / all} %</li>
-      </ul>
+      <p>No Feedback yet</p>
     </>
   );
 };
