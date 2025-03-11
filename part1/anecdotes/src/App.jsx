@@ -13,13 +13,25 @@ const App = () => {
   ];
 
   const [selected, setSelected] = useState(0);
+  const [votes, setVotes] = useState(new Array(8).fill(0));
+
+  let randomIndex = 0;
+  while (randomIndex === selected) {
+    randomIndex = Math.floor(Math.random() * 8);
+  }
+
+  const IncreaseVotes = () => {
+    const newVotes = [...votes];
+    newVotes[selected] += 1;
+    setVotes(newVotes);
+  };
 
   return (
     <div>
       <p>{anecdotes[selected]}</p>
-      <button onClick={() => setSelected(Math.floor(Math.random() * 8))}>
-        Random anecdote
-      </button>
+      <p>Votes: {votes[selected]}</p>
+      <button onClick={IncreaseVotes}>Vote</button>
+      <button onClick={() => setSelected(randomIndex)}>Random anecdote</button>
     </div>
   );
 };
