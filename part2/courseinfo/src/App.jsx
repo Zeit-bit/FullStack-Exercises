@@ -16,6 +16,10 @@ const Content = ({ parts }) => {
       {parts.map((x) => (
         <Part key={x.id} name={x.name} exercises={x.exercises} />
       ))}
+      <Part
+        name="All"
+        exercises={parts.reduce((s, x) => (s += x.exercises), 0)}
+      />
     </>
   );
 };
