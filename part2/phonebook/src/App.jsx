@@ -6,6 +6,14 @@ const App = () => {
 
   const AddPerson = (event) => {
     event.preventDefault();
+
+    const newNameAlreadyExists =
+      persons.find((p) => p.name === newName) !== undefined;
+    if (newNameAlreadyExists) {
+      alert(`${newName} is already added to phonebook`);
+      return;
+    }
+
     const personObject = {
       name: newName,
     };
@@ -28,8 +36,8 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      {persons.map((x) => (
-        <li key={x.name}>{x.name}</li>
+      {persons.map((p) => (
+        <li key={p.name}>{p.name}</li>
       ))}
     </div>
   );
