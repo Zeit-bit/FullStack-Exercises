@@ -75,6 +75,8 @@ const App = () => {
       persons.find((p) => p.name === newName) !== undefined;
     if (newNameAlreadyExists) {
       alert(`${newName} is already added to phonebook`);
+      setNewName("");
+      setNewNumber("");
       return;
     }
 
@@ -82,9 +84,14 @@ const App = () => {
       name: newName,
       number: newNumber,
     };
-    setPersons(persons.concat(personObject));
-    setNewName("");
-    setNewNumber("");
+
+    axios
+      .post("http://localhost:3001/persons", personObject)
+      .then((response) => {
+        setPersons(persons.concat(response.data));
+        setNewName("");
+        setNewNumber("");
+      });
   };
 
   const HandleInputChange = (event, setValue) => setValue(event.target.value);
