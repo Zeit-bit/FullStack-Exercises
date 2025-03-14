@@ -4,7 +4,7 @@ import contactService from "./services/contacts";
 const Filter = ({ filter, setFilter, HandleInputChange }) => {
   return (
     <div>
-      Filter shown with:
+      Filter shown with:{" "}
       <input
         value={filter}
         onChange={(event) => HandleInputChange(event, setFilter)}
@@ -44,12 +44,21 @@ const ContactForm = ({
   );
 };
 
-const Contacts = ({ personsToShow }) => {
+const Contacts = ({ personsToShow, persons, setPersons }) => {
+  const deleteContact = (id) => {
+    if (window.confirm(`Delete ${persons.find((p) => p.id === id).name} ?`)) {
+      contactService.deleteContact(id).then(() => {
+        setPersons(persons.filter((p) => p.id !== id));
+      });
+    }
+  };
+
   return (
     <div>
       {personsToShow.map((p) => (
-        <li key={p.name}>
-          {p.name} ({p.number})
+        <li key={p.id}>
+          {p.name} ({p.number}){"  "}
+          <button onClick={() => deleteContact(p.id)}>delete</button>
         </li>
       ))}
     </div>
@@ -123,7 +132,11 @@ const App = () => {
       />
 
       <h2>Contacts</h2>
-      <Contacts personsToShow={personsToShow} />
+      <Contacts
+        personsToShow={personsToShow}
+        persons={persons}
+        setPersons={setPersons}
+      />
     </div>
   );
 };

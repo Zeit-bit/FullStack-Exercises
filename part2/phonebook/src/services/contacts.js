@@ -10,4 +10,8 @@ const create = (newContact) => {
   return axios.post(url, newContact).then((response) => response.data);
 };
 
-export default { getAll, create };
+const deleteContact = (id) => {
+  return axios.delete(`${url}/${id}`);
+};
+
+export default { getAll, create, deleteContact };
