@@ -44,31 +44,24 @@ const ContactForm = ({
   );
 };
 
-const Contacts = ({ personsToShow, persons, setPersons }) => {
-  const deleteContact = (id) => {
-    if (window.confirm(`Delete ${persons.find((p) => p.id === id).name} ?`)) {
-      contactService.deleteContact(id).then(() => {
-        setPersons(persons.filter((p) => p.id !== id));
-      });
-    }
-  };
-
+const Contacts = ({ personsToShow, DeleteContact }) => {
   return (
     <div>
       {personsToShow.map((p) => (
         <li key={p.id}>
           {p.name} ({p.number}){"  "}
-          <button onClick={() => deleteContact(p.id)}>delete</button>
+          <button onClick={() => DeleteContact(p.id)}>delete</button>
         </li>
       ))}
     </div>
   );
 };
 
-const Notification = ({ message }) => {
+const Notification = ({ message, IsAnError }) => {
+  const classSelection = IsAnError ? "error" : "success";
   if (message === null) return null;
 
-  return <div className="notification">{message}</div>;
+  return <div className={classSelection}>{message}</div>;
 };
 
 const App = () => {
@@ -76,12 +69,17 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
-  const [notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState([null, null]);
 
+  // Updates the persons state to the data fetched from the server
   useEffect(() => {
     contactService.getAll().then((persons) => setPersons(persons));
   }, []);
 
+  // Function that handles the change of state in the inputs
+  const HandleInputChange = (event, setValue) => setValue(event.target.value);
+
+  // Function that updates the persons state and makes a post to the server with the new person
   const AddPerson = (event) => {
     event.preventDefault();
 
@@ -93,6 +91,8 @@ const App = () => {
     const personFound = persons.find((p) => p.name === newName);
     const newNameAlreadyExists = personFound !== undefined;
 
+    // If the person already exists, it will replace the object in the server with the one with updated number
+    // using the put method, and update the persons state to match
     if (newNameAlreadyExists) {
       const confirmMessage = `${newName} is already added to phonebook, replace old number with a new one?`;
 
@@ -100,8 +100,11 @@ const App = () => {
         contactService
           .replaceNumber(personFound.id, personObject)
           .then((personModified) => {
-            setNotification(`Changed number of ${personModified.name}`);
-            setTimeout(() => setNotification(null), 5000);
+            setNotification([
+              `Changed number of ${personModified.name}`,
+              false,
+            ]);
+            setTimeout(() => setNotification([null, null]), 5000);
             setPersons(
               persons.map((p) => (p.id !== personFound.id ? p : personModified))
             );
@@ -113,17 +116,39 @@ const App = () => {
       return;
     }
 
+    // If it gets here, then it makes a post to the server with the new person
     contactService.create(personObject).then((newPerson) => {
-      setNotification(`Added ${personObject.name}`);
-      setTimeout(() => setNotification(null), 5000);
+      setNotification([`Added ${newPerson.name}`, false]);
+      setTimeout(() => setNotification([null, null]), 5000);
       setPersons(persons.concat(newPerson));
       setNewName("");
       setNewNumber("");
     });
   };
 
-  const HandleInputChange = (event, setValue) => setValue(event.target.value);
+  // Function that deletes the contact from the server and updates persons state to match
+  const DeleteContact = (id) => {
+    const personToDelete = persons.find((p) => p.id === id);
+    if (window.confirm(`Delete ${personToDelete.name} ?`)) {
+      contactService
+        .deleteContact(id)
+        .then(() => {
+          setNotification([`Deleted ${personToDelete.name}`, false]);
+          setTimeout(() => setNotification([null, null]), 5000);
+          setPersons(persons.filter((p) => p.id !== id));
+        })
+        .catch(() => {
+          setNotification([
+            `Information of ${personToDelete.name} has already been removed from server`,
+            true,
+          ]);
+          setTimeout(() => setNotification([null, null]), 5000);
+          setPersons(persons.filter((p) => p.id !== id));
+        });
+    }
+  };
 
+  // Creates a copy of the persons state but filtering it based on importance
   const personsToShow =
     filter.length > 0
       ? persons.filter((p) => {
@@ -137,7 +162,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification message={notification[0]} IsAnError={notification[1]} />
       <Filter
         filter={filter}
         setFilter={setFilter}
@@ -155,11 +180,7 @@ const App = () => {
       />
 
       <h2>Contacts</h2>
-      <Contacts
-        personsToShow={personsToShow}
-        persons={persons}
-        setPersons={setPersons}
-      />
+      <Contacts personsToShow={personsToShow} DeleteContact={DeleteContact} />
     </div>
   );
 };
