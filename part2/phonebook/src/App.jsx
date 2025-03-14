@@ -65,11 +65,18 @@ const Contacts = ({ personsToShow, persons, setPersons }) => {
   );
 };
 
+const Notification = ({ message }) => {
+  if (message === null) return null;
+
+  return <div className="notification">{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     contactService.getAll().then((persons) => setPersons(persons));
@@ -93,10 +100,10 @@ const App = () => {
         contactService
           .replaceNumber(personFound.id, personObject)
           .then((personModified) => {
+            setNotification(`Changed number of ${personModified.name}`);
+            setTimeout(() => setNotification(null), 5000);
             setPersons(
-              persons
-                .filter((p) => p.id !== personFound.id)
-                .concat(personModified)
+              persons.map((p) => (p.id !== personFound.id ? p : personModified))
             );
             setNewName("");
             setNewNumber("");
@@ -107,6 +114,8 @@ const App = () => {
     }
 
     contactService.create(personObject).then((newPerson) => {
+      setNotification(`Added ${personObject.name}`);
+      setTimeout(() => setNotification(null), 5000);
       setPersons(persons.concat(newPerson));
       setNewName("");
       setNewNumber("");
@@ -128,7 +137,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <Notification message={notification} />
       <Filter
         filter={filter}
         setFilter={setFilter}
