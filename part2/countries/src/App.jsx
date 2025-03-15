@@ -27,19 +27,22 @@ const App = () => {
           onChange={(event) => setInput(event.target.value)}
         />
       </div>
-      <CountryContent contentToShow={contentToShow} />
+      <CountryContent contentToShow={contentToShow} setInput={setInput} />
     </>
   );
 };
 
-const CountryContent = ({ contentToShow }) => {
+const CountryContent = ({ contentToShow, setInput }) => {
   if (contentToShow.length > 10) {
     return <div>Too many matches, specify another filter</div>;
   } else if (contentToShow.length > 1) {
     return (
       <div>
         {contentToShow.map((c) => (
-          <li key={c.name.common}>{c.name.common}</li>
+          <li key={c.name.common}>
+            {c.name.common}{" "}
+            <button onClick={() => setInput(c.name.common)}>Show</button>
+          </li>
         ))}
       </div>
     );
