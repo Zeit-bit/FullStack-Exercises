@@ -117,13 +117,21 @@ const App = () => {
     }
 
     // If it gets here, then it makes a post to the server with the new person
-    contactService.create(personObject).then((newPerson) => {
-      setNotification([`Added ${newPerson.name}`, false]);
-      setTimeout(() => setNotification([null, null]), 5000);
-      setPersons(persons.concat(newPerson));
-      setNewName("");
-      setNewNumber("");
-    });
+    contactService
+      .create(personObject)
+      .then((newPerson) => {
+        setNotification([`Added ${newPerson.name}`, false]);
+        setTimeout(() => setNotification([null, null]), 5000);
+        setPersons(persons.concat(newPerson));
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((error) => {
+        setNotification([error.response.data.error, true]);
+        setTimeout(() => setNotification([null, null]), 5000);
+        setNewName("");
+        setNewNumber("");
+      });
   };
 
   // Function that deletes the contact from the server and updates persons state to match
