@@ -110,6 +110,12 @@ const App = () => {
             );
             setNewName("");
             setNewNumber("");
+          })
+          .catch((error) => {
+            setNotification([error.response.data.error, true]);
+            setTimeout(() => setNotification([null, null]), 5000);
+            setNewName("");
+            setNewNumber("");
           });
       }
 
