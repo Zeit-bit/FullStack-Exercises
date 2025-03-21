@@ -11,3 +11,14 @@ Content-Type: application/json
     "url": "https://www.reddit.com/r/learnjavascript/comments/gd0vaz/recommendation_fullstackopencom_will_knock/",
     "likes": 220
 }
+
+### Post another new blog
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+    "title": "What do I need to know before starting FullStackOpen?",
+    "author": "999sexy",
+    "url": "https://www.reddit.com/r/learnprogramming/comments/uqerap/what_do_i_need_to_know_before_starting/",
+    "likes": 3
+}
