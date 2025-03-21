@@ -8,7 +8,18 @@ const totalLikes = (blogs) => {
   return blogs.reduce(sumOfLikes, 0)
 }
 
+const favouriteBlog = (blogs) => {
+  if (blogs.length === 0) return {}
+  const mostVotedQty = Math.max(...blogs.map(blog => blog.likes))
+  const mostVotedBlog = blogs.find(blog => blog.likes === mostVotedQty)
+  delete mostVotedBlog._id
+  delete mostVotedBlog.__v
+  delete mostVotedBlog.url
+  return mostVotedBlog
+}
+
 module.exports = {
   dummy,
-  totalLikes
+  totalLikes,
+  favouriteBlog
 }
