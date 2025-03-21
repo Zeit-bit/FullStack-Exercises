@@ -1,0 +1,13 @@
+### Get all blogs
+GET http://localhost:3001/api/blogs
+
+### Post new blog
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+    "title": "[RECOMMENDATION] Fullstackopen.com Will Knock Tutorial Hell Out Of You",
+    "author": "[Deleted]",
+    "url": "https://www.reddit.com/r/learnjavascript/comments/gd0vaz/recommendation_fullstackopencom_will_knock/",
+    "likes": 220
+}
