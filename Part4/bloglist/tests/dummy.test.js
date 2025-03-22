@@ -94,3 +94,18 @@ describe('Favourite blog', () => {
     assert.deepStrictEqual(result, strippedBlog)
   })
 })
+
+describe('Author with most blogs', () => {
+  test('when list has only one blog, equals that author and blog count of 1', () => {
+    const result = listHelper.mostBlogs(listWithOneBlog)
+    assert.deepStrictEqual(result, { author: 'Michael Chan', blogs: 1 })
+  })
+  test('when list is empty, equals empty object', () => {
+    const result = listHelper.mostBlogs(listWithZeroBlogs)
+    assert.deepStrictEqual(result, {})
+  })
+  test('when list has multiple blogs, equals the author with most blogs', () => {
+    const result = listHelper.mostBlogs(blogs)
+    assert.deepStrictEqual(result, { author: 'Robert C. Martin', blogs: 3 })
+  })
+})
