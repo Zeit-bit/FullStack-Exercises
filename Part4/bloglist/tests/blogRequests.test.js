@@ -66,6 +66,12 @@ describe('When there are blogs in the database', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
     })
+
+    test('the blogs have correct id format', async () => {
+      const blogs = (await api.get('/api/blogs')).body
+      const blogsWithCorrectIds = blogs.filter(blog => !blog._id && blog.id)
+      assert.strictEqual(blogsWithCorrectIds.length, initialBlogs.length)
+    })
   })
 
   after(async () => {
