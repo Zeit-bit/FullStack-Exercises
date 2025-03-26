@@ -112,6 +112,32 @@ describe('When there are blogs in the database', () => {
 
       assert.deepStrictEqual(blogSaved, expectedBlog)
     })
+
+    test('if url property is missing, server responds with 400 Bad request', async () => {
+      const newBlog = {
+        title: 'Testing a blog without URL',
+        author: 'Orlando Smith',
+        likes: 0
+      }
+
+      await api.post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+    })
+
+    test('if title property is missing, server responds with 400 Bad request', async () => {
+      const newBlog = {
+        author: 'Tyler Smith',
+        url: 'http://Testing-a-blog-without-title',
+        likes: 0
+      }
+
+      await api.post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+    })
   })
 
   after(async () => {
