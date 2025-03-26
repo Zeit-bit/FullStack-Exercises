@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
-    "test": "node --test"
+    "start": "MODE_ENV=production node index.js",
+    "dev": "MODE_ENV=development node --watch index.js",
+    "test": "MODE_ENV=test node --test"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +19,8 @@
     "mongoose": "^8.12.1"
   },
   "devDependencies": {
-    "standard": "^17.1.2"
+    "standard": "^17.1.2",
+    "supertest": "^7.1.0"
   },
   "eslintConfig": {
     "extends": "./node_modules/standard/eslintrc.json"
