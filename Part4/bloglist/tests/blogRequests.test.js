@@ -94,6 +94,24 @@ describe('When there are blogs in the database', () => {
       assert.strictEqual(blogs.length, initialBlogs.length + 1)
       assert.deepStrictEqual(blogSaved, newBlog)
     })
+
+    test('if likes property is missing, it defaults to zero', async () => {
+      const newBlog = {
+        title: 'Testing a blog without likes property',
+        author: 'Cesar Sosa',
+        url: 'http://localhost:3001'
+      }
+
+      const response = await api.post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const expectedBlog = { ...newBlog, likes: 0 }
+      const { id, _id, __v, ...blogSaved } = response.body
+
+      assert.deepStrictEqual(blogSaved, expectedBlog)
+    })
   })
 
   after(async () => {
