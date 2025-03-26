@@ -132,6 +132,35 @@ describe('When there are blogs in the database', () => {
     })
   })
 
+  describe('When using PUT /api/blogs/:id', () => {
+    test('if id exists, it updates the likes property', async () => {
+      const blogs = await helper.getAllBlogsFromDB()
+      const newBlog = {
+        ...blogs[0], likes: 777
+      }
+      const updatedBlog = (await api.put(`/api/blogs/${blogs[0].id}`)
+        .send(newBlog)).body
+      assert.strictEqual(updatedBlog.likes, 777)
+    })
+    test('if id is not found, server returns 404 Not found', async () => {
+      const nonExistingID = await helper.nonExistingID()
+      const newBlog = {
+        likes: 777
+      }
+      await api.put(`/api/blogs/${nonExistingID}`)
+        .send(newBlog)
+        .expect(404)
+    })
+    test('if id is malformatted, server returns 400 Bad Request', async () => {
+      const newBlog = {
+        likes: 777
+      }
+      await api.put('/api/blogs/-1')
+        .send(newBlog)
+        .expect(400)
+    })
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })
