@@ -4,53 +4,14 @@ const assert = require('node:assert')
 const app = require('../app')
 const { default: mongoose } = require('mongoose')
 const Blog = require('../models/blog')
-
+const helper = require('./blogtest_helper')
 const api = supertest(app)
-
-const initialBlogs = [
-  {
-    title: 'React patterns',
-    author: 'Michael Chan',
-    url: 'https://reactpatterns.com/',
-    likes: 7
-  },
-  {
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5
-  },
-  {
-    title: 'Canonical string reduction',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-    likes: 12
-  },
-  {
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
-    likes: 10
-  },
-  {
-    title: 'TDD harms architecture',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-    likes: 0
-  },
-  {
-    title: 'Type wars',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
-    likes: 2
-  }
-]
 
 describe('When there are blogs in the database', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
-    for (const blog in initialBlogs) {
-      const newBlog = new Blog(initialBlogs[blog])
+    for (const blog in helper.initialBlogs) {
+      const newBlog = new Blog(helper.initialBlogs[blog])
       await newBlog.save()
     }
   })
@@ -58,7 +19,7 @@ describe('When there are blogs in the database', () => {
   describe('When using GET /api/blogs', () => {
     test('the amount of blogs returned is correct', async () => {
       const response = await api.get('/api/blogs')
-      assert.strictEqual(response.body.length, initialBlogs.length)
+      assert.strictEqual(response.body.length, helper.initialBlogs.length)
     })
 
     test('the returned blogs are in json format', async () => {
@@ -70,7 +31,7 @@ describe('When there are blogs in the database', () => {
     test('the blogs have correct id format', async () => {
       const blogs = (await api.get('/api/blogs')).body
       const blogsWithCorrectIds = blogs.filter(blog => !blog._id && blog.id)
-      assert.strictEqual(blogsWithCorrectIds.length, initialBlogs.length)
+      assert.strictEqual(blogsWithCorrectIds.length, helper.initialBlogs.length)
     })
   })
 
@@ -91,7 +52,7 @@ describe('When there are blogs in the database', () => {
       const blogs = (await api.get('/api/blogs')).body
       const { id, _id, __v, ...blogSaved } = blogs[blogs.length - 1]
 
-      assert.strictEqual(blogs.length, initialBlogs.length + 1)
+      assert.strictEqual(blogs.length, helper.initialBlogs.length + 1)
       assert.deepStrictEqual(blogSaved, newBlog)
     })
 
@@ -137,6 +98,37 @@ describe('When there are blogs in the database', () => {
         .send(newBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
+    })
+  })
+
+  describe('When using DELETE /api/blogs/:id', () => {
+    describe('If id exists:', () => {
+      test('the amount of blogs is decreased by one', async () => {
+        const blogs = await helper.getAllBlogsFromDB()
+        const idToDelete = blogs[blogs.length - 1].id
+        await api.delete(`/api/blogs/${idToDelete}`).expect(204)
+        const updatedBlogs = await helper.getAllBlogsFromDB()
+        assert.strictEqual(updatedBlogs.length, helper.initialBlogs.length - 1)
+      })
+
+      test('the updated database does not contain the blog deleted', async () => {
+        const blogs = await helper.getAllBlogsFromDB()
+        const idToDelete = blogs[blogs.length - 1].id
+        await api.delete(`/api/blogs/${idToDelete}`).expect(204)
+        const updatedBlogs = await helper.getAllBlogsFromDB()
+        const ids = updatedBlogs.map(blog => blog.id)
+        assert(!ids.includes(idToDelete))
+      })
+    })
+
+    test('if id is not found, server returns 404 Not found', async () => {
+      const nonExistingID = await helper.nonExistingID()
+      await api.delete(`/api/blogs/${nonExistingID}`).expect(404)
+    })
+
+    test('if id is malformatted, server returns 400 Bad Request', async () => {
+      const malformattedID = '-1'
+      await api.delete(`/api/blogs/${malformattedID}`).expect(400)
     })
   })
 

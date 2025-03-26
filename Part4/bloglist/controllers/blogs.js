@@ -6,15 +6,17 @@ blogRouter.get('/api/blogs', async (request, response) => {
   response.json(blogs)
 })
 
-blogRouter.post('/api/blogs', async (request, response, next) => {
-  const body = request.body
-  const blog = new Blog(body)
-  try {
-    const savedBlog = await blog.save()
-    response.status(201).json(savedBlog)
-  } catch (error) {
-    response.status(400).json({ error: error.message })
-  }
+blogRouter.post('/api/blogs', async (request, response) => {
+  const blog = new Blog(request.body)
+
+  const savedBlog = await blog.save()
+  response.status(201).json(savedBlog)
+})
+
+blogRouter.delete('/api/blogs/:id', async (request, response) => {
+  const deletedBlog = await Blog.findByIdAndDelete(request.params.id)
+  if (!deletedBlog) return response.status(404).end()
+  response.status(204).end()
 })
 
 module.exports = blogRouter
