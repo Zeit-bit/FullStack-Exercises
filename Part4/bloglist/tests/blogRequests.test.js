@@ -74,6 +74,28 @@ describe('When there are blogs in the database', () => {
     })
   })
 
+  describe('When using POST /api/blogs', () => {
+    test('the amount of blogs returned is increased by one', async () => {
+      const newBlog = {
+        title: 'Backend Tests & Async/Await',
+        author: 'John Frusciante',
+        url: 'https://www.youtube.com/watch?v=GLvohMXgcBo',
+        likes: 250
+      }
+
+      await api.post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const blogs = (await api.get('/api/blogs')).body
+      const { id, _id, __v, ...blogSaved } = blogs[blogs.length - 1]
+
+      assert.strictEqual(blogs.length, initialBlogs.length + 1)
+      assert.deepStrictEqual(blogSaved, newBlog)
+    })
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })
